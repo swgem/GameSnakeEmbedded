@@ -244,14 +244,4 @@ void EXTI15_10_IRQHandler(void)
 
 /* USER CODE BEGIN 1 */
 
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-
-}
-
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_10); // Toggle LED just for tests
-}
-
 /* USER CODE END 1 */

@@ -22,6 +22,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include "AppCore.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -95,16 +97,19 @@ int main(void)
 
   HAL_TIM_Base_Start_IT(&htim2);
 
+  app_init();
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-    /* USER CODE END WHILE */
 
-    /* USER CODE BEGIN 3 */
-  }
+  app_loop();
+  
+  /* USER CODE END WHILE */
+
+  /* USER CODE BEGIN 3 */
+  
   /* USER CODE END 3 */
 }
 
