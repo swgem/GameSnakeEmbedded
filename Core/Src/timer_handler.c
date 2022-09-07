@@ -5,6 +5,7 @@
  *      Author: eric_
  */
 
+#include "hw_manager.h"
 #include "timer_handler.h"
 #include "main.h"
 #include "stm32f1xx_it.h"
@@ -13,46 +14,33 @@
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-  static int state_curr = 0;
+    if (htim == hw_main_timer()) {
+        static int state_curr = 0;
 
-  state_curr++;
-  if (state_curr == 10) {
-    state_curr = 0;
-  }
+        state_curr++;
+        if (state_curr == 10) {
+            state_curr = 0;
+        }
 
-  // switch(state_curr) {
-  //   case 0:
-  //     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
+        switch(state_curr) {
+        case 0:
+            hw_set_pin(HW_PIN_OUT_H0);
+            hw_reset_pin(HW_PIN_OUT_H1);
 
-  //     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
-  //     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
-  //   break;
-  //   default:
-  //     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_RESET);
+            hw_reset_pin(HW_PIN_OUT_L0);
+        break;
+        case 1:
+            hw_reset_pin(HW_PIN_OUT_H0);
+            hw_set_pin(HW_PIN_OUT_H1);
 
-  //     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);
-  //     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
-  //   break;
-  // }
+            hw_reset_pin(HW_PIN_OUT_L0);
+        break;
+        default:
+            hw_reset_pin(HW_PIN_OUT_H0);
+            hw_reset_pin(HW_PIN_OUT_H1);
 
-  switch(state_curr) {
-    case 0:
-      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
-
-      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
-    break;
-    case 1:
-      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);
-
-      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
-    break;
-    default:
-      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_RESET);
-      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
-
-      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
-    break;
-  }
+            hw_set_pin(HW_PIN_OUT_L0);
+        break;
+        }
+    }
 }

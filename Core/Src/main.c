@@ -23,6 +23,7 @@
 /* USER CODE BEGIN Includes */
 
 #include "AppCore.h"
+#include "hw_manager.h"
 
 /* USER CODE END Includes */
 
@@ -96,6 +97,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   HAL_TIM_Base_Start_IT(&htim2);
+
+  hw_set_main_timer(&htim2);
 
   app_init();
 
