@@ -1,31 +1,37 @@
 -------------------------------------------------
 GPIO output:
 
-PA10
-PB5
-PB4
-PB10
-PA8
-PA9
-PC7
-PB6
-PA7
-PA6
-PB9
-PB8
-PC8
-PC6
-PC5
-PA12
-PA11
-PB12
-PB11
-PB2
+PA10    H0
+PB5     H1
+PB4     H2
+PB10    H3
+PA8     H4
+PA9     H5
+PC7     H6
+PB6     H7
+PA7     H8
+PA6     H9
+PB9     L0
+PB8     L1
+PC8     L2
+PC6     L3
+PC5     L4
+PA12    L5
+PA11    L6
+PB12    L7
+PB11    L8
+PB2     L9
+
+H* pins are connected to the LEDs anode.
+L* pins are connected to the LEDs cathode.
+
+Numbering indicates which line or column the pin
+is related to.
 
 -------------------------------------------------
 GPIO input (EXTI):
 
-PB1
-PB15
-PB14
-PB13
+PB1     nd
+PB15    nd
+PB14    nd
+PB13    nd
