@@ -1,5 +1,5 @@
 /*
- * gpio_manager.h
+ * gpio_handler.h
  *
  *  Created on: 28 de ago de 2022
  *      Author: eric_
