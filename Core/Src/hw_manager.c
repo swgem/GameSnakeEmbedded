@@ -75,10 +75,10 @@ const TIM_HandleTypeDef* hw_main_timer() {
     return g_main_timer;
 }
 
-void hw_set_pin(HW_PIN pin) {
+__INLINE void hw_set_pin(HW_PIN pin) {
     HAL_GPIO_WritePin(hw_GPIOx(pin), hw_GPIO_Pin(pin), GPIO_PIN_SET);
 }
 
-void hw_reset_pin(HW_PIN pin) {
+__INLINE void hw_reset_pin(HW_PIN pin) {
     HAL_GPIO_WritePin(hw_GPIOx(pin), hw_GPIO_Pin(pin), GPIO_PIN_RESET);
 }
