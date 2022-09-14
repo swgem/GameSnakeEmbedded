@@ -13,4 +13,6 @@
 void app_init();
 void app_loop();
 
+int* get_matrix_buf();
+
 #endif /* INC_APPCORE_H_ */

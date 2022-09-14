@@ -10,101 +10,22 @@
 #include "led_matrix_manager.h"
 #include "hw_manager.h"
 
-//// INTERNAL ENUM
+//// INTERNAL MACRO
 
-typedef enum {
-    LEDS_STATE_INIT = 0,
-    LEDS_STATE_MACHINE_LINE_0,
-    LEDS_STATE_MACHINE_LINE_1,
-    LEDS_STATE_MACHINE_LINE_2,
-    LEDS_STATE_MACHINE_LINE_3,
-    LEDS_STATE_MACHINE_LINE_4,
-    LEDS_STATE_MACHINE_LINE_5,
-    LEDS_STATE_MACHINE_LINE_6,
-    LEDS_STATE_MACHINE_LINE_7,
-    LEDS_STATE_MACHINE_LINE_8,
-    LEDS_STATE_MACHINE_LINE_9,
-
-    LEDS_STATE_MACHINE_MAX = LEDS_STATE_MACHINE_LINE_9
-} LEDS_STATE_MACHINE;
+#define COL_LENGTH 10
+#define ROW_LENGTH 10
 
 //// INTERNAL VARIABLE
 
-static int state_curr = LEDS_STATE_INIT;
+static int g_curr_col = 0;
+static int g_led_matrix[COL_LENGTH] = {0}; // row pin is represented as a single bit
 
 //// INTERNAL FUNCTION DECLARATION
 
-static void leds_reset_all_hpins();
-static void leds_set_all_lpins();
-
-static void leds_state_machine_line_0();
-static void leds_state_machine_line_1();
-static void leds_state_machine_line_2();
-static void leds_state_machine_line_3();
-static void leds_state_machine_line_4();
-static void leds_state_machine_line_5();
-static void leds_state_machine_line_6();
-static void leds_state_machine_line_7();
-static void leds_state_machine_line_8();
-static void leds_state_machine_line_9();
+__STATIC_FORCEINLINE void leds_set_all_lpins();
+__STATIC_FORCEINLINE void print_matrix(int curr_row);
 
 //// FUNCTION IMPLEMENTATION
-
-void run_leds_state_machine() {
-    state_curr++;
-    if (state_curr > LEDS_STATE_MACHINE_MAX) {
-        state_curr = LEDS_STATE_MACHINE_LINE_0;
-    }
-
-    switch(state_curr) {
-    case LEDS_STATE_MACHINE_LINE_0:
-        leds_state_machine_line_0();
-    break;
-    case LEDS_STATE_MACHINE_LINE_1:
-        leds_state_machine_line_1();
-    break;
-    case LEDS_STATE_MACHINE_LINE_2:
-        leds_state_machine_line_2();
-    break;
-    case LEDS_STATE_MACHINE_LINE_3:
-        leds_state_machine_line_3();
-    break;
-    case LEDS_STATE_MACHINE_LINE_4:
-        leds_state_machine_line_4();
-    break;
-    case LEDS_STATE_MACHINE_LINE_5:
-        leds_state_machine_line_5();
-    break;
-    case LEDS_STATE_MACHINE_LINE_6:
-        leds_state_machine_line_6();
-    break;
-    case LEDS_STATE_MACHINE_LINE_7:
-        leds_state_machine_line_7();
-    break;
-    case LEDS_STATE_MACHINE_LINE_8:
-        leds_state_machine_line_8();
-    break;
-    case LEDS_STATE_MACHINE_LINE_9:
-        leds_state_machine_line_9();
-    break;
-    default:
-        Error_Handler();
-    break;
-    }
-}
-
-__STATIC_FORCEINLINE void leds_reset_all_hpins() {
-    hw_reset_pin(HW_PIN_OUT_H0);
-    hw_reset_pin(HW_PIN_OUT_H1);
-    hw_reset_pin(HW_PIN_OUT_H2);
-    hw_reset_pin(HW_PIN_OUT_H3);
-    hw_reset_pin(HW_PIN_OUT_H4);
-    hw_reset_pin(HW_PIN_OUT_H5);
-    hw_reset_pin(HW_PIN_OUT_H6);
-    hw_reset_pin(HW_PIN_OUT_H7);
-    hw_reset_pin(HW_PIN_OUT_H8);
-    hw_reset_pin(HW_PIN_OUT_H9);
-}
 
 __STATIC_FORCEINLINE void leds_set_all_lpins() {
     hw_set_pin(HW_PIN_OUT_L0);
@@ -119,55 +40,36 @@ __STATIC_FORCEINLINE void leds_set_all_lpins() {
     hw_set_pin(HW_PIN_OUT_L9);
 }
 
-__STATIC_FORCEINLINE void leds_state_machine_line_0() {
-    leds_reset_all_hpins();
-    hw_set_pin(HW_PIN_OUT_H0);
-    hw_reset_pin(HW_PIN_OUT_L0);
+__STATIC_FORCEINLINE HW_PIN get_row_pin(int row) {
+    return (HW_PIN)row;
 }
 
-__STATIC_FORCEINLINE void leds_state_machine_line_1() {
-    leds_reset_all_hpins();
-    hw_set_pin(HW_PIN_OUT_H1);
-    hw_reset_pin(HW_PIN_OUT_L0);
+__STATIC_FORCEINLINE HW_PIN get_col_pin(int col) {
+    return (HW_PIN)(col + ROW_LENGTH);
 }
 
-__STATIC_FORCEINLINE void leds_state_machine_line_2() {
-    leds_reset_all_hpins();
-    hw_set_pin(HW_PIN_OUT_H2);
+__STATIC_FORCEINLINE void print_matrix(int curr_col) {
+    // Reset only current col
+    leds_set_all_lpins();
+    hw_reset_pin(get_col_pin(curr_col));
+
+    // Set active columns from current col
+    for (int i = 0; i < ROW_LENGTH; i++) {
+        (g_led_matrix[curr_col] & (0x1 << i)) ?
+            hw_set_pin(get_row_pin(i)) : hw_reset_pin(get_row_pin(i));
+    }
 }
 
-__STATIC_FORCEINLINE void leds_state_machine_line_3() {
-    leds_reset_all_hpins();
-    hw_set_pin(HW_PIN_OUT_H3);
+void run_leds_state_machine() {
+    print_matrix(g_curr_col);
+
+    if (++g_curr_col >= COL_LENGTH) {
+        g_curr_col = 0;
+    }
 }
 
-__STATIC_FORCEINLINE void leds_state_machine_line_4() {
-    leds_reset_all_hpins();
-    hw_set_pin(HW_PIN_OUT_H4);
+void set_led_matrix(const int buf[]) {
+    for (int i = 0; i < ROW_LENGTH; i++) {
+        g_led_matrix[i] = buf[i];
+    }
 }
-
-__STATIC_FORCEINLINE void leds_state_machine_line_5() {
-    leds_reset_all_hpins();
-    hw_set_pin(HW_PIN_OUT_H5);
-}
-
-__STATIC_FORCEINLINE void leds_state_machine_line_6() {
-    leds_reset_all_hpins();
-    hw_set_pin(HW_PIN_OUT_H6);
-}
-
-__STATIC_FORCEINLINE void leds_state_machine_line_7() {
-    leds_reset_all_hpins();
-    hw_set_pin(HW_PIN_OUT_H7);
-}
-
-__STATIC_FORCEINLINE void leds_state_machine_line_8() {
-    leds_reset_all_hpins();
-    hw_set_pin(HW_PIN_OUT_H8);
-}
-
-__STATIC_FORCEINLINE void leds_state_machine_line_9() {
-    leds_reset_all_hpins();
-    hw_set_pin(HW_PIN_OUT_H9);
-}
-
