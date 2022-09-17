@@ -20,8 +20,11 @@ static int g_matrix_buf[COL_LENGTH] = {0}; // column pin is represented as a sin
 //// FUNCTION IMPLEMENTATION
 
 void app_init() {
-    g_matrix_buf[0] = (0x1 << 0);
-    g_matrix_buf[1] = (0x1 << 0);
+    g_matrix_buf[0] |= (0x1 << 0);
+	g_matrix_buf[0] |= (0x1 << 1);
+    //g_matrix_buf[1] |= (0x1 << 0);
+	g_matrix_buf[1] |= (0x1 << 1);
+	g_matrix_buf[2] |= (0x1 << 0);
 }
 
 void app_loop() {
