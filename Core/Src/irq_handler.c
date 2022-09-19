@@ -27,12 +27,18 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     static int tick_count = 0;
+    static int tick_count_sec = 0;
     if (htim == hw_main_timer()) {
         if (++tick_count >= (1000 / FRAME_RATE)) {
             tick_count = 0;
             update_led_matrix();
         }
         run_leds_state_machine();
+
+        if (++tick_count_sec >= 300) {
+            tick_count_sec = 0;
+            push_event(SYS_EVENT_TIMER_300_MSEC);
+        }
     }
 }
 
