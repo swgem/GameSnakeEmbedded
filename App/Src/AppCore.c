@@ -89,15 +89,24 @@ static void mem_free_impl(void* addr) {
 static void refresh_buf() {
     const SNAKE* snake = get_snake();
 
-    while (g_matrix_buf_lock == 1);
+    // Make sure matrix is not being printed and then lock resource
+    while (g_matrix_buf_lock);
     g_matrix_buf_lock = 1;
 
+    // Clear current buffer
     for (int i = 0; i < COL_LENGTH; i++) {
         g_matrix_buf[i] = 0;
     }
 
+    // Print snake
     g_matrix_buf[snake->head.pos_x] = 0x1 << snake->head.pos_y;
+    SNAKE_SEG* iter = snake->head.next_seg;
+    while (iter != (void*)0) {
+        g_matrix_buf[iter->pos_x] = 0x1 << iter->pos_y;
+        iter = iter->next_seg;
+    }
 
+    // Unlock resource
     g_matrix_buf_lock = 0;
 }
 
