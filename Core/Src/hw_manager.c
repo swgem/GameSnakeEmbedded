@@ -9,66 +9,48 @@
 
 //// INTERNAL VARIABLE
 
-static const GPIO_TypeDef* g_hw_pin_GPIOx[] = {
-    GPIOA,
-    GPIOB,
-    GPIOB,
-    GPIOB,
-    GPIOA,
-    GPIOA,
-    GPIOC,
-    GPIOB,
-    GPIOA,
-    GPIOA,
-    GPIOB,
-    GPIOB,
-    GPIOC,
-    GPIOC,
-    GPIOA,
-    GPIOA,
-    GPIOB,
-    GPIOB,
-    GPIOB,
-    GPIOB
-};
-
-static const uint16_t g_hw_pin_GPIO_Pin[] = {
-    GPIO_PIN_10,
-    GPIO_PIN_5,
-    GPIO_PIN_4,
-    GPIO_PIN_10,
-    GPIO_PIN_8,
-    GPIO_PIN_9,
-    GPIO_PIN_7,
-    GPIO_PIN_6,
-    GPIO_PIN_7,
-    GPIO_PIN_6,
-    GPIO_PIN_9,
-    GPIO_PIN_8,
-    GPIO_PIN_8,
-    GPIO_PIN_6,
-    GPIO_PIN_5,
-    GPIO_PIN_12,
-    GPIO_PIN_11,
-    GPIO_PIN_12,
-    GPIO_PIN_11,
-    GPIO_PIN_2
+static const uint32_t g_hw_pin[] = {
+    (uint32_t)GPIOA, (uint32_t)GPIO_PIN_10,
+    (uint32_t)GPIOB, (uint32_t)GPIO_PIN_5,
+    (uint32_t)GPIOB, (uint32_t)GPIO_PIN_4,
+    (uint32_t)GPIOB, (uint32_t)GPIO_PIN_10,
+    (uint32_t)GPIOA, (uint32_t)GPIO_PIN_8,
+    (uint32_t)GPIOA, (uint32_t)GPIO_PIN_9,
+    (uint32_t)GPIOC, (uint32_t)GPIO_PIN_7,
+    (uint32_t)GPIOB, (uint32_t)GPIO_PIN_6,
+    (uint32_t)GPIOA, (uint32_t)GPIO_PIN_7,
+    (uint32_t)GPIOA, (uint32_t)GPIO_PIN_6,
+    (uint32_t)GPIOB, (uint32_t)GPIO_PIN_9,
+    (uint32_t)GPIOB, (uint32_t)GPIO_PIN_8,
+    (uint32_t)GPIOC, (uint32_t)GPIO_PIN_8,
+    (uint32_t)GPIOC, (uint32_t)GPIO_PIN_6,
+    (uint32_t)GPIOC, (uint32_t)GPIO_PIN_5,
+    (uint32_t)GPIOA, (uint32_t)GPIO_PIN_12,
+    (uint32_t)GPIOB, (uint32_t)GPIO_PIN_11,
+    (uint32_t)GPIOB, (uint32_t)GPIO_PIN_12,
+    (uint32_t)GPIOB, (uint32_t)GPIO_PIN_11,
+    (uint32_t)GPIOB, (uint32_t)GPIO_PIN_2
 };
 
 static TIM_HandleTypeDef* g_main_timer = NULL;
 
+//// INTERNAL FUNCTION DECLARATION
+
+__STATIC_FORCEINLINE GPIO_TypeDef* hw_GPIOx(HW_PIN pin);
+__STATIC_FORCEINLINE uint16_t hw_GPIO_Pin(HW_PIN pin);
+
 //// FUNCTION IMPLEMENTATION
+
+__STATIC_FORCEINLINE GPIO_TypeDef* hw_GPIOx(HW_PIN pin) {
+    return (GPIO_TypeDef*)g_hw_pin[2*pin];
+}
+
+__STATIC_FORCEINLINE uint16_t hw_GPIO_Pin(HW_PIN pin) {
+    return (uint16_t)g_hw_pin[2*pin + 1];
+}
 
 void hw_set_main_timer(TIM_HandleTypeDef* tim) {
     g_main_timer = tim;
-}
-
-const GPIO_TypeDef* hw_GPIOx(HW_PIN pin) {
-    return g_hw_pin_GPIOx[pin];
-}
-
-const uint16_t hw_GPIO_Pin(HW_PIN pin) {
-    return g_hw_pin_GPIO_Pin[pin];
 }
 
 const TIM_HandleTypeDef* hw_main_timer() {

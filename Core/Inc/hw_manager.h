@@ -39,8 +39,6 @@ typedef enum {
 
 void hw_set_main_timer(TIM_HandleTypeDef* tim);
 
-const GPIO_TypeDef* hw_GPIOx(HW_PIN pin);
-const uint16_t hw_GPIO_Pin(HW_PIN pin);
 const TIM_HandleTypeDef* hw_main_timer();
 
 void hw_set_pin(HW_PIN pin);
