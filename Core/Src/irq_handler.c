@@ -13,7 +13,7 @@
 
 //// INTERNAL MACRO
 
-#define FRAME_RATE 10 // fps
+#define FRAME_RATE 5 // fps
 
 //// INTERNAL FUNCTION DECLARATION
 
@@ -34,7 +34,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
         if (++tick_count0 >= (1000 / FRAME_RATE)) {
             tick_count0 = 0;
-            
+            update_led_matrix();
         }
 
         if (++tick_count1 >= 100) {
@@ -45,8 +45,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
         if (++tick_count2 >= 250) {
             tick_count2 = 0;
             push_event(SYS_EVENT_TIMER_250_MSEC);
-
-            update_led_matrix();
         }
     }
 }
