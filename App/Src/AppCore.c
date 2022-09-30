@@ -102,7 +102,7 @@ static void refresh_buf() {
     g_matrix_buf[snake->head.pos_x] = 0x1 << snake->head.pos_y;
     SNAKE_SEG* iter = snake->head.next_seg;
     while (iter != (void*)0) {
-        g_matrix_buf[iter->pos_x] = 0x1 << iter->pos_y;
+        g_matrix_buf[iter->pos_x] |= 0x1 << iter->pos_y;
         iter = iter->next_seg;
     }
 
