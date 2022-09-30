@@ -36,7 +36,7 @@ static void refresh_buf();
 //// FUNCTION IMPLEMENTATION
 
 void app_init() {
-    set_game_config(100, 5, 5, 10000, 2, 0, 0, 2, MOVEMENT_DIRECTION_RIGHT);
+    set_game_config(100, 5, 5, 10000, 3, 1, 2, 2, MOVEMENT_DIRECTION_RIGHT);
     set_system_fatal_func(system_fatal_impl);
     set_mem_alloc_func(mem_alloc_impl);
     set_generate_random_func(generate_random_impl);
@@ -57,6 +57,20 @@ void app_loop() {
                 g_event = SYS_EVENT_NONE;
                 game_run();
                 refresh_buf();
+                break;
+            case SYS_EVENT_TIMER_250_MSEC:
+                break;
+            case SYS_EVENT_CHANGE_DIRECTION_UP:
+                set_snake_direction(MOVEMENT_DIRECTION_UP);
+                break;
+            case SYS_EVENT_CHANGE_DIRECTION_DOWN:
+                set_snake_direction(MOVEMENT_DIRECTION_DOWN);
+                break;
+            case SYS_EVENT_CHANGE_DIRECTION_RIGHT:
+                set_snake_direction(MOVEMENT_DIRECTION_RIGHT);
+                break;
+            case SYS_EVENT_CHANGE_DIRECTION_LEFT:
+                set_snake_direction(MOVEMENT_DIRECTION_LEFT);
                 break;
             default:
                 break;

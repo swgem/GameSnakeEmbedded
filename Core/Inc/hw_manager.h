@@ -33,6 +33,10 @@ typedef enum {
     HW_PIN_OUT_L7,
     HW_PIN_OUT_L8,
     HW_PIN_OUT_L9,
+    HW_PIN_IN_B0,
+    HW_PIN_IN_B1,
+    HW_PIN_IN_B2,
+    HW_PIN_IN_B3
 } HW_PIN;
 
 //// EXTERNAL FUNCTION DECLARATION
@@ -40,6 +44,8 @@ typedef enum {
 void hw_set_main_timer(TIM_HandleTypeDef* tim);
 
 const TIM_HandleTypeDef* hw_main_timer();
+
+HW_PIN hw_input_pin(uint16_t GPIO_Pin);
 
 void hw_set_pin(HW_PIN pin);
 void hw_reset_pin(HW_PIN pin);

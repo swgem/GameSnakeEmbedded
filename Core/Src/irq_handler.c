@@ -22,7 +22,22 @@ static void update_led_matrix();
 //// OVERWRITE FUNCTION IMPLEMENTATION
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-
+    switch (hw_input_pin(GPIO_Pin)) {
+        case HW_PIN_IN_B0:
+            push_event(SYS_EVENT_CHANGE_DIRECTION_UP);
+            break;
+        case HW_PIN_IN_B1:
+            push_event(SYS_EVENT_CHANGE_DIRECTION_DOWN);
+            break;
+        case HW_PIN_IN_B2:
+            push_event(SYS_EVENT_CHANGE_DIRECTION_RIGHT);
+            break;
+        case HW_PIN_IN_B3:
+            push_event(SYS_EVENT_CHANGE_DIRECTION_LEFT);
+            break;
+        default:
+            break;
+    }
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
