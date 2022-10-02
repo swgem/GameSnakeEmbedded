@@ -24,7 +24,6 @@ static SYS_EVENT g_event = SYS_EVENT_NONE;
 
 //// INTERNAL FUNCTION DECLARATION
 
-// static void swap_led_example();
 
 static void system_fatal_impl();
 static void* mem_alloc_impl(int size);
@@ -123,28 +122,6 @@ static void refresh_buf() {
     // Unlock resource
     g_matrix_buf_lock = 0;
 }
-
-// static void swap_led_example() {
-//     static int st = 0;
-//     if (st == 0) {
-//         g_matrix_buf[0] = 0b10101;
-//         g_matrix_buf[1] = 0b01010;
-//         g_matrix_buf[2] = 0b10101;
-//         g_matrix_buf[3] = 0b01010;
-//         g_matrix_buf[4] = 0b10101;
-
-//         st = 1;
-//     }
-//     else {
-//         g_matrix_buf[0] = 0b01010;
-//         g_matrix_buf[1] = 0b10101;
-//         g_matrix_buf[2] = 0b01010;
-//         g_matrix_buf[3] = 0b10101;
-//         g_matrix_buf[4] = 0b01010;
-
-//         st = 0;
-//     }
-// }
 
 int* get_matrix_buf() {
     int* ret = (void*)0;
