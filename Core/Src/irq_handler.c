@@ -15,6 +15,10 @@
 
 #define FRAME_RATE 10 // fps
 
+//// INTERNAL GLOBAL VARIABLE
+
+static int g_initial_gpio_lock = 1;
+
 //// INTERNAL FUNCTION DECLARATION
 
 static void update_led_matrix();
@@ -22,21 +26,23 @@ static void update_led_matrix();
 //// OVERWRITE FUNCTION IMPLEMENTATION
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-    switch (hw_input_pin(GPIO_Pin)) {
-        case HW_PIN_IN_B0:
-            push_event(SYS_EVENT_CHANGE_DIRECTION_UP);
-            break;
-        case HW_PIN_IN_B1:
-            push_event(SYS_EVENT_CHANGE_DIRECTION_DOWN);
-            break;
-        case HW_PIN_IN_B2:
-            push_event(SYS_EVENT_CHANGE_DIRECTION_RIGHT);
-            break;
-        case HW_PIN_IN_B3:
-            push_event(SYS_EVENT_CHANGE_DIRECTION_LEFT);
-            break;
-        default:
-            break;
+    if (!g_initial_gpio_lock) {
+        switch (hw_input_pin(GPIO_Pin)) {
+            case HW_PIN_IN_B0:
+                push_event(SYS_EVENT_CHANGE_DIRECTION_UP);
+                break;
+            case HW_PIN_IN_B1:
+                push_event(SYS_EVENT_CHANGE_DIRECTION_DOWN);
+                break;
+            case HW_PIN_IN_B2:
+                push_event(SYS_EVENT_CHANGE_DIRECTION_RIGHT);
+                break;
+            case HW_PIN_IN_B3:
+                push_event(SYS_EVENT_CHANGE_DIRECTION_LEFT);
+                break;
+            default:
+                break;
+        }
     }
 }
 
@@ -59,6 +65,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
         if (++tick_count2 >= 250) {
             tick_count2 = 0;
+            g_initial_gpio_lock = 0;
             push_event(SYS_EVENT_TIMER_250_MSEC);
         }
     }
