@@ -37,7 +37,7 @@ static int g_matrix_buf[COL_LENGTH] = {0}; // column pin is represented as a sin
 static int g_new_event = 0;
 static SYS_EVENT g_event_buf[EVENT_BUF_SIZE] = { SYS_EVENT_NONE };
 
-//// INTERNAL FUNCTION DECLARATION
+static int g_blink_food = 0;
 
 //// INTERNAL FUNCTION DECLARATION
 
@@ -72,6 +72,7 @@ void app_loop() {
                     refresh_buf();
                     break;
                 case SYS_EVENT_TIMER_250_MSEC:
+                    g_blink_food = (g_blink_food) ? 0 : 1;
                     break;
                 case SYS_EVENT_CHANGE_DIRECTION_UP:
                     set_snake_direction(MOVEMENT_DIRECTION_UP);
@@ -149,6 +150,7 @@ static void mem_free_impl(void* addr) {
 
 static void refresh_buf() {
     const SNAKE* snake = get_snake();
+    const FOOD* food = get_food();
 
     // Make sure matrix is not being printed and then lock resource
     while (g_matrix_buf_lock);
@@ -165,6 +167,11 @@ static void refresh_buf() {
     while (iter != (void*)0) {
         g_matrix_buf[iter->pos_x] |= 0x1 << iter->pos_y;
         iter = iter->next_seg;
+    }
+
+    // Print food
+    if (g_blink_food) {
+        g_matrix_buf[food->pos_x] |= 0x1 << food->pos_y;
     }
 
     // Unlock resource
