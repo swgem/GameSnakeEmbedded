@@ -13,7 +13,7 @@
 
 //// INTERNAL MACRO
 
-#define FRAME_RATE 5 // fps
+#define FRAME_RATE 10 // fps
 
 //// INTERNAL FUNCTION DECLARATION
 

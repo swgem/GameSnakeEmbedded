@@ -28,5 +28,6 @@ void app_loop();
 int* get_matrix_buf();
 
 void push_event(SYS_EVENT ev);
+SYS_EVENT pop_event();
 
 #endif /* INC_APPCORE_H_ */

@@ -17,6 +17,7 @@
 #define ROW_LENGTH 5
 #define MEM_BLOCK_SIZE 32 // byte (must be multiple of 4)
 #define MEM_BUF_SIZE (COL_LENGTH * ROW_LENGTH) // number of blocks
+#define EVENT_BUF_SIZE 10
 
 //// INTERNAL STRUCT
 
@@ -26,18 +27,19 @@ typedef struct {
 
 //// INTERNAL VARIABLE
 
-static MEM_BLOCK g_mem_buf[MEM_BUF_SIZE];
-static int g_mem_buf_availability[MEM_BUF_SIZE]; // Content indicates number of following
-                                                 // continuous memory allocated
+static MEM_BLOCK g_mem_buf[MEM_BUF_SIZE] = { 0 };
+static int g_mem_buf_availability[MEM_BUF_SIZE] = { 0 }; // Content indicates number of following
+                                                         // continuous memory allocated
 
 static int g_matrix_buf_lock = 0; // cannot get matrix when '1'
 static int g_matrix_buf[COL_LENGTH] = {0}; // column pin is represented as a single bit
 
-static SYS_EVENT g_event = SYS_EVENT_NONE;
+static int g_new_event = 0;
+static SYS_EVENT g_event_buf[EVENT_BUF_SIZE] = { SYS_EVENT_NONE };
 
 //// INTERNAL FUNCTION DECLARATION
 
-static void mem_free_all();
+//// INTERNAL FUNCTION DECLARATION
 
 static void system_fatal_impl();
 static void* mem_alloc_impl(int size);
@@ -49,8 +51,6 @@ static void refresh_buf();
 //// FUNCTION IMPLEMENTATION
 
 void app_init() {
-    mem_free_all();
-
     set_game_config(100, COL_LENGTH, ROW_LENGTH, 10000, 3, 1, 2, 2, MOVEMENT_DIRECTION_RIGHT);
     set_system_fatal_func(system_fatal_impl);
     set_mem_alloc_func(mem_alloc_impl);
@@ -58,44 +58,37 @@ void app_init() {
     set_mem_free_func(mem_free_impl);
 
     game_restart();
-
-    //g_matrix_buf[0] |= (0x1 << 0);
-	//g_matrix_buf[0] |= (0x1 << 1);
 }
 
 void app_loop() {
     while (1) {
-        switch(g_event) {
-            case SYS_EVENT_NONE:
-                break;
-            case SYS_EVENT_TIMER_100_MSEC:
-                g_event = SYS_EVENT_NONE;
-                game_run();
-                refresh_buf();
-                break;
-            case SYS_EVENT_TIMER_250_MSEC:
-                break;
-            case SYS_EVENT_CHANGE_DIRECTION_UP:
-                set_snake_direction(MOVEMENT_DIRECTION_UP);
-                break;
-            case SYS_EVENT_CHANGE_DIRECTION_DOWN:
-                set_snake_direction(MOVEMENT_DIRECTION_DOWN);
-                break;
-            case SYS_EVENT_CHANGE_DIRECTION_RIGHT:
-                set_snake_direction(MOVEMENT_DIRECTION_RIGHT);
-                break;
-            case SYS_EVENT_CHANGE_DIRECTION_LEFT:
-                set_snake_direction(MOVEMENT_DIRECTION_LEFT);
-                break;
-            default:
-                break;
+        if (g_new_event) {
+            SYS_EVENT ev = pop_event();
+            switch(ev) {
+                case SYS_EVENT_NONE:
+                    break;
+                case SYS_EVENT_TIMER_100_MSEC:
+                    game_run();
+                    refresh_buf();
+                    break;
+                case SYS_EVENT_TIMER_250_MSEC:
+                    break;
+                case SYS_EVENT_CHANGE_DIRECTION_UP:
+                    set_snake_direction(MOVEMENT_DIRECTION_UP);
+                    break;
+                case SYS_EVENT_CHANGE_DIRECTION_DOWN:
+                    set_snake_direction(MOVEMENT_DIRECTION_DOWN);
+                    break;
+                case SYS_EVENT_CHANGE_DIRECTION_RIGHT:
+                    set_snake_direction(MOVEMENT_DIRECTION_RIGHT);
+                    break;
+                case SYS_EVENT_CHANGE_DIRECTION_LEFT:
+                    set_snake_direction(MOVEMENT_DIRECTION_LEFT);
+                    break;
+                default:
+                    break;
+            }
         }
-    }
-}
-
-static void mem_free_all() {
-    for (int i = 0; i < MEM_BUF_SIZE; i++) {
-        g_mem_buf_availability[i] = 0;
     }
 }
 
@@ -187,5 +180,27 @@ int* get_matrix_buf() {
 }
 
 void push_event(SYS_EVENT ev) {
-    g_event = ev;
+    for (int i = 0; i < EVENT_BUF_SIZE; i++) {
+        if (g_event_buf[i] == SYS_EVENT_NONE) {
+            g_event_buf[i] = ev;
+            break;
+        }
+    }
+    g_new_event = 1;
+}
+
+SYS_EVENT pop_event() {
+    SYS_EVENT ret = g_event_buf[0];
+    
+    for (int i = 1; i < EVENT_BUF_SIZE; i++) {
+        g_event_buf[i - 1] = g_event_buf[i];
+        if (g_event_buf[i] == SYS_EVENT_NONE) {
+            break;
+        }
+    }
+
+    g_event_buf[EVENT_BUF_SIZE - 1] = SYS_EVENT_NONE;
+    if (g_event_buf[0] == SYS_EVENT_NONE) g_new_event = 0;
+    
+    return ret;
 }
